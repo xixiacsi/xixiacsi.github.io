@@ -81,6 +81,15 @@
     <div id="tableContainer"></div>
 
     <script>
+     // 禁用查看源代码和右键菜单和F12按键
+        document.addEventListener('contextmenu', function (e) {
+            e.preventDefault();
+        });
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && e.key === 'I')) {
+                e.preventDefault();
+            }
+        });
         // 获取更新的 uid，注意更新
         const pwd1 = 'lizhiguozhi'; // 允许的 uid
         const pwd2 = 'ss0513'; // 允许的 uid
