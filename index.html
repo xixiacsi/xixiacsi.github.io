@@ -68,7 +68,7 @@
     <p style="text-align: right;">内部资料，注意保密</p>
     <h1 style="text-align: center;">栖霞公会管理系统</h1>
     <p id="updateTime" style="text-align: center;"></p>
-    <button onclick="downloadXML()">下载数据文件</button>
+    <button id="downloadButton" onclick="downloadXML()">下载数据文件</button>
     <br>
     <button onclick="generatePowerTable()">查询（战力）</button>
     <input type="checkbox" id="member">成员
@@ -81,7 +81,7 @@
     <div id="tableContainer"></div>
 
     <script>
-     // 禁用查看源代码和右键菜单和F12按键
+        // 禁用查看源代码和右键菜单和F12按键
         document.addEventListener('contextmenu', function (e) {
             e.preventDefault();
         });
@@ -96,6 +96,8 @@
         // 获取当前 URL 的参数
         const urlParams = new URLSearchParams(window.location.search);
         const uid = urlParams.get('uid');
+        const downloadParam = urlParams.get('download');
+        const modeParam = urlParams.get('mode');
 
         // 判断 uid 是否为 xyjuser
         if (uid!== pwd1 && uid!== pwd2) {
@@ -263,8 +265,34 @@
             xhr.send();
         }
 
-        // 页面加载时获取更新时间
-        window.onload = getUpdateTime;
+        // 根据URL参数处理下载按钮显示和自动查询
+        function handleUrlParams() {
+            if (downloadParam === '0') {
+                const downloadButton = document.getElementById('downloadButton');
+                downloadButton.style.display = 'none';
+            }
+
+            if (modeParam === 'all') {
+                generatePowerTable();
+            } else if (modeParam === 'tc') {
+                const petCheckbox = document.getElementById('pet');
+                petCheckbox.checked = true;
+                generateTitleTable();
+            }else if (modeParam === 'jy'){
+                const eliteCheckbox = document.getElementById('elite');
+                eliteCheckbox.checked = true;
+                generateTitleTable();
+            }else if (modeParam === 'zx'){
+                const executiveCheckbox = document.getElementById('executive');
+                executiveCheckbox.checked = true;
+                generateTitleTable();}
+        }
+
+        // 页面加载时获取更新时间和处理URL参数
+        window.onload = function () {
+            getUpdateTime();
+            handleUrlParams();
+        };
     </script>
 </body>
 
