@@ -65,6 +65,8 @@
 </head>
 
 <body>
+    <p style="text-align: right;">内部资料，注意保密</p>
+    <h1 style="text-align: center;">栖霞公会管理系统</h1>
     <button onclick="generatePowerTable()">查询（战力）</button>
     <input type="checkbox" id="member">成员
     <input type="checkbox" id="elite">精英
@@ -187,7 +189,7 @@
                     const table = document.createElement('table');
                     const thead = document.createElement('thead');
                     const headerRow = document.createElement('tr');
-                    const headers = ['序号', '姓名', '战力', '职务'];
+                    const headers = ['序号', '姓名', '战力（单位：万）', '职务'];
                     headers.forEach(headerText => {
                         const th = document.createElement('th');
                         th.textContent = headerText;
