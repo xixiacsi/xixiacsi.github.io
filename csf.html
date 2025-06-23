@@ -90,7 +90,10 @@
                 e.preventDefault();
             }
         });
-        // 获取更新的 uid，注意更新
+        const urlParams = new URLSearchParams(window.location.search);
+        const uid = urlParams.get('uid');
+        const downloadParam = urlParams.get('download');
+        const modeParam = urlParams.get('mode');
        // 获取更新的 uid，注意更新
 const pwd1 = 'lizhiguozhi'; // 允许的 uid
 const pwd2 = 'ss0513'; // 允许的 uid
