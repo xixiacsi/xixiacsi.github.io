@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>栖霞公会职务管理系统</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 10px;
+        }
+
+        button {
+            padding: 8px 12px;
+            margin: 5px;
+            cursor: pointer;
+        }
+
+        input[type="checkbox"] {
+            margin: 5px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .top30 {
+            background-color: lightblue;
+        }
+
+        /* 手机端样式调整 */
+        @media only screen and (max-width: 600px) {
+            button {
+                width: 100%;
+                margin: 5px 0;
+            }
+
+            input[type="checkbox"] {
+                margin: 5px 3px;
+            }
+
+            table {
+                font-size: 12px;
+            }
+
+            th,
+            td {
+                padding: 5px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <p style="text-align: right;">内部资料，注意保密</p>
+    <h1 style="text-align: center;">栖霞公会管理系统</h1>
+    <p id="updateTime" style="text-align: center;"></p>
+    <button id="downloadButton" onclick="downloadXML()">下载数据文件</button>
+    <br>
+    <button onclick="generatePowerTable()">查询（战力）</button>
+    <input type="checkbox" id="member">成员
+    <input type="checkbox" id="elite">精英
+    <input type="checkbox" id="pet">团宠
+    <input type="checkbox" id="executive">执行官
+    <input type="checkbox" id="vicePresident">副会长
+    <input type="checkbox" id="president">会长
+    <button onclick="generateTitleTable()">查询（职务）</button>
+    <div id="tableContainer"></div>
+
+    <script>
+        // 禁用查看源代码和右键菜单和F12按键
+        document.addEventListener('contextmenu', function (e) {
+            e.preventDefault();
+        });
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && e.key === 'I')) {
+                e.preventDefault();
+            }
+        });
+        // 获取更新的 uid，注意更新
+       // 获取更新的 uid，注意更新
+const pwd1 = 'lizhiguozhi'; // 允许的 uid
+const pwd2 = 'ss0513'; // 允许的 uid
+
+// 页面加载时验证 uid
+verifyUid();
+
+// 监听 popstate 事件，用户点击返回或前进时再次验证 uid
+window.addEventListener('popstate', verifyUid);
+
+function verifyUid() {
+    // 优先获取 localStorage 中的值
+    let uid = localStorage.getItem('lilypwd');
+
+    // 如果 localStorage 中没有值或验证失败，再获取 URL 参数
+    if (!uid || (uid !== pwd1 && uid !== pwd2)) {
+        const urlParams = new URLSearchParams(window.location.search);
+        uid = urlParams.get('uid');
+    }
+
+    // 判断 uid 是否合法
+    if (uid !== pwd1 && uid !== pwd2) {
+        // 如果不是，重定向到 502.html 并替换当前历史记录
+       window.history.replaceState({}, '', `502.html?uid=${uid}`);
+            window.location.href = `502.html?uid=${uid}`;
+        }
+
+        // 页面加载时验证 uid
+        verifyUid();
+
+        // 监听 popstate 事件，用户点击返回或前进时再次验证 uid
+        window.addEventListener('popstate', verifyUid);
+
+        function verifyUid() {
+            // 这里可以添加验证逻辑
+        }
+}
+
+
+        function downloadXML() {
+            const a = document.createElement('a');
+            a.href = 'Activity.xml';
+            a.download = 'Activity.xml';
+            a.click();
+        }
+
+        function generatePowerTable() {
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', 'Activity.xml', true);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    const xmlDoc = xhr.responseXML;
+                    const cyds = xmlDoc.getElementsByTagName('cyd');
+                    const data = [];
+                    for (let i = 0; i < cyds.length; i++) {
+                        const name = cyds[i].getElementsByTagName('Name')[0].textContent;
+                        const power = parseInt(cyds[i].getElementsByTagName('Power')[0].textContent);
+                        const title = cyds[i].getElementsByTagName('Title')[0].textContent;
+                        data.push({ name, power, title });
+                    }
+                    data.sort((a, b) => b.power - a.power);
+                    const table = document.createElement('table');
+                    const thead = document.createElement('thead');
+                    const headerRow = document.createElement('tr');
+                    const headers = ['序号', '姓名', '战力（单位：万）', '职务'];
+                    headers.forEach(headerText => {
+                        const th = document.createElement('th');
+                        th.textContent = headerText;
+                        headerRow.appendChild(th);
+                    });
+                    thead.appendChild(headerRow);
+                    table.appendChild(thead);
+                    const tbody = document.createElement('tbody');
+                    data.forEach((item, index) => {
+                        const row = document.createElement('tr');
+                        if (index < 30) {
+                            row.classList.add('top30');
+                        }
+                        const rankCell = document.createElement('td');
+                        rankCell.textContent = index + 1;
+                        row.appendChild(rankCell);
+                        const nameCell = document.createElement('td');
+                        nameCell.textContent = item.name;
+                        row.appendChild(nameCell);
+                        const powerCell = document.createElement('td');
+                        powerCell.textContent = item.power;
+                        row.appendChild(powerCell);
+                        const titleCell = document.createElement('td');
+                        titleCell.textContent = item.title;
+                        row.appendChild(titleCell);
+                        tbody.appendChild(row);
+                    });
+                    table.appendChild(tbody);
+                    const tableContainer = document.getElementById('tableContainer');
+                    tableContainer.innerHTML = '';
+                    tableContainer.appendChild(table);
+                }
+            };
+            xhr.send();
+        }
+
+        function generateTitleTable() {
+            const memberCheckbox = document.getElementById('member');
+            const eliteCheckbox = document.getElementById('elite');
+            const petCheckbox = document.getElementById('pet');
+            const executiveCheckbox = document.getElementById('executive');
+            const vicePresidentCheckbox = document.getElementById('vicePresident');
+            const presidentCheckbox = document.getElementById('president');
+            const selectedTitles = [];
+            if (memberCheckbox.checked) selectedTitles.push('成员');
+            if (eliteCheckbox.checked) selectedTitles.push('精英');
+            if (petCheckbox.checked) selectedTitles.push('团宠');
+            if (executiveCheckbox.checked) selectedTitles.push('执行官');
+            if (vicePresidentCheckbox.checked) selectedTitles.push('副会长');
+            if (presidentCheckbox.checked) selectedTitles.push('会长');
+            if (selectedTitles.length === 0) {
+                alert('请至少选择一个职务');
+                return;
+            }
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', 'Activity.xml', true);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    const xmlDoc = xhr.responseXML;
+                    const cyds = xmlDoc.getElementsByTagName('cyd');
+                    const data = [];
+                    for (let i = 0; i < cyds.length; i++) {
+                        const name = cyds[i].getElementsByTagName('Name')[0].textContent;
+                        const power = parseInt(cyds[i].getElementsByTagName('Power')[0].textContent);
+                        const title = cyds[i].getElementsByTagName('Title')[0].textContent;
+                        if (selectedTitles.includes(title)) {
+                            data.push({ name, power, title });
+                        }
+                    }
+                    data.sort((a, b) => b.power - a.power);
+                    const table = document.createElement('table');
+                    const thead = document.createElement('thead');
+                    const headerRow = document.createElement('tr');
+                    const headers = ['序号', '姓名', '战力（单位：万）', '职务'];
+                    headers.forEach(headerText => {
+                        const th = document.createElement('th');
+                        th.textContent = headerText;
+                        headerRow.appendChild(th);
+                    });
+                    thead.appendChild(headerRow);
+                    table.appendChild(thead);
+                    const tbody = document.createElement('tbody');
+                    data.forEach((item, index) => {
+                        const row = document.createElement('tr');
+                        const rankCell = document.createElement('td');
+                        rankCell.textContent = index + 1;
+                        row.appendChild(rankCell);
+                        const nameCell = document.createElement('td');
+                        nameCell.textContent = item.name;
+                        row.appendChild(nameCell);
+                        const powerCell = document.createElement('td');
+                        powerCell.textContent = item.power;
+                        row.appendChild(powerCell);
+                        const titleCell = document.createElement('td');
+                        titleCell.textContent = item.title;
+                        row.appendChild(titleCell);
+                        tbody.appendChild(row);
+                    });
+                    table.appendChild(tbody);
+                    const tableContainer = document.getElementById('tableContainer');
+                    tableContainer.innerHTML = '';
+                    tableContainer.appendChild(table);
+                }
+            };
+            xhr.send();
+        }
+
+        // 获取 XML 数据更新时间
+        function getUpdateTime() {
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', 'Activity.xml', true);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    const xmlDoc = xhr.responseXML;
+                    const dataroot = xmlDoc.getElementsByTagName('dataroot')[0];
+                    const generated = dataroot.getAttribute('generated');
+                    const updateTimeElement = document.getElementById('updateTime');
+                    updateTimeElement.textContent = `数据更新时间: ${generated}`;
+                }
+            };
+            xhr.send();
+        }
+
+        // 根据URL参数处理下载按钮显示和自动查询
+        function handleUrlParams() {
+            if (downloadParam === '0') {
+                const downloadButton = document.getElementById('downloadButton');
+                downloadButton.style.display = 'none';
+            }
+
+            if (modeParam === 'all') {
+                generatePowerTable();
+            } else if (modeParam === 'tc') {
+                const petCheckbox = document.getElementById('pet');
+                petCheckbox.checked = true;
+                generateTitleTable();
+            }else if (modeParam === 'jy'){
+                const eliteCheckbox = document.getElementById('elite');
+                eliteCheckbox.checked = true;
+                generateTitleTable();
+            }else if (modeParam === 'zx'){
+                const executiveCheckbox = document.getElementById('executive');
+                executiveCheckbox.checked = true;
+                generateTitleTable();}
+        }
+
+        // 页面加载时获取更新时间和处理URL参数
+        window.onload = function () {
+            getUpdateTime();
+            handleUrlParams();
+        };
+    </script>
+</body>
+
+</html>
