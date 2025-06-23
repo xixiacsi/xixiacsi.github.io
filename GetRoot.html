@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>获取预授权</title>
+
+    <style>
+        /*
+
+编写人：映日雪 立项时间0406
+*/
+/*表格相关*/
+th,
+td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+    font-size:20px;
+}
+
+th {
+    background-color: #f2f2f2;
+}
+/*全局格式*/
+
+p,text{
+    font-size:20px;
+}
+.left{
+    text-align:left
+}
+.right{
+    text-align:right
+}
+.center{
+    text-align:center
+}
+    </style>
+
+
+</head>
+<body >
+<script type="text/javascript">
+!function() {
+    (function(t, e) {
+        var o = ["lilypwd", "rootlog"];
+        var a = ["授权完成", "栖霞公会职务管理系统长期授权凭证\n授权时间：{time}\n授权代码：{code}\n授权人:月桂酱"];
+        var r = {
+            set: function(k, v) {
+                t.setItem(k, v);
+            },
+            format: function(s, p) {
+                return s.replace(/{(\w+)}/g, function(m, c) {
+                    return p[c] || m;
+                });
+            },
+            redirect: function(u) {
+                e.replaceState({}, '', u);
+                e.href = u;
+            }
+        };
+        var n = "lizhiguozhi";
+        var i = new Date().toLocaleString();
+        r.set(o[0], n);
+        r.set(o[1], r.format(a[1], {time: i, code: n}));
+        alert(a[0]);
+        r.redirect("index.html?form=root&download=0&mode=all&ver=6231");
+    })(localStorage, window);
+}();
+</script>
+
+
+    </div>
+</body>
+</html>
